@@ -1,2 +1,10 @@
 [tools]
 shellcheck = "latest"
+
+[tasks.defaults-diff]
+description = "Discover what `defaults write` commands correspond to a macOS settings change."
+run = "macos/defaults-diff.sh"
+
+[tasks.shellcheck]
+description = "Lint all shell scripts with shellcheck."
+run = "shellcheck *.sh"
