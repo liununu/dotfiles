@@ -35,6 +35,10 @@ echo "› Siri & Spotlight"
 # Don't share Spotlight search queries with Apple
 defaults write com.apple.assistant.support "Search Queries Data Sharing Status" -int 2
 
+echo "› Finder"
+# Show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
 echo "› Keyboard"
 # Set key repeat rate to Fast
 defaults write NSGlobalDomain KeyRepeat -int 2
