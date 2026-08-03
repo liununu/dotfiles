@@ -23,7 +23,7 @@ run = "macos/defaults-diff.sh"
 
 [tasks.shellcheck]
 description = "Lint all shell scripts with shellcheck."
-run = "shellcheck *.sh"
+run = "shellcheck *.sh macos/*.sh"
 
 [tasks."brew:dump"]
 description = "Dump currently installed packages into Brewfile."
