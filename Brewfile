@@ -1,0 +1,12 @@
+brew "git"
+brew "mise"
+brew "tmux"
+brew "tree"
+brew "iperf3"
+
+cask "1password"
+cask "1password-cli"
+cask "keepingyouawake"
+cask "raycast"
+cask "typora"
+cask "ghostty"
