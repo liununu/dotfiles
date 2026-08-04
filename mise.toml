@@ -1,21 +1,21 @@
 [tools]
 shellcheck = "latest"
 
-[tasks.setup]
-description = "Full setup: brew bundle + symlinks + macOS defaults."
-run = "./setup.sh"
+[tasks.bootstrap]
+description = "Full setup: brew bundle + tools + macOS defaults."
+run = "./bootstrap.sh"
 
-[tasks.link]
-description = "Symlink dotfiles into $HOME only."
-run = "./setup.sh --link"
+[tasks.tools]
+description = "Per-tool link (.links) + setup (.setup) in one pass."
+run = "./bootstrap.sh --tools"
 
 [tasks.brew]
 description = "Install packages from Brewfile."
-run = "./setup.sh --brew"
+run = "./bootstrap.sh --brew"
 
 [tasks.defaults]
 description = "Set macOS defaults."
-run = "./setup.sh --defaults"
+run = "./bootstrap.sh --defaults"
 
 [tasks."defaults:diff"]
 description = "Discover what `defaults write` commands correspond to a macOS settings change."
@@ -23,7 +23,7 @@ run = "macos/defaults-diff.sh"
 
 [tasks.shellcheck]
 description = "Lint all shell scripts with shellcheck."
-run = "shellcheck *.sh macos/*.sh"
+run = "shellcheck bootstrap.sh macos/*.sh */.setup"
 
 [tasks."brew:dump"]
 description = "Dump currently installed packages into Brewfile."

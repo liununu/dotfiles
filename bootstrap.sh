@@ -4,8 +4,6 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$REPO_ROOT"
 
-# ---- helpers ----------------------------------------------------------------
-
 info()    { printf '  \033[1;36m%s\033[0m\n' "$*"; }
 success() { printf '  \033[32m%s\033[0m\n' "$*"; }
 warn()    { printf '  \033[33m%s\033[0m\n' "$*"; }
@@ -25,31 +23,45 @@ link() {
     fi
 }
 
-# ---- steps ------------------------------------------------------------------
+# Tool dirs are any directory containing a .links manifest and/or a .setup script.
+# Both are optional.
+discover_tools() {
+    find . -maxdepth 2 \( -name '.links' -o -name '.setup' \) \
+        -not -path './.git/*' \
+        -exec dirname {} \; | sort -u
+}
 
-do_link() {
-    info "Symlinking dotfiles → \$HOME"
+# Apply .links manifest.
+# Format: src=dest (both relative — src to tool dir, dest to $HOME)
+#   .zshrc=.zshrc                       → file symlink
+#   .=.hammerspoon                      → directory symlink
+link_from_manifest() {
+    local linksfile="$1" dir
+    dir="$(dirname "$linksfile")"
 
-    # Auto-discover .links manifests in each tool directory.
-    # Format: src=dest (both relative — src to tool dir, dest to $HOME)
-    #   .zshrc=.zshrc                       → file symlink
-    #   .=.hammerspoon                      → directory symlink
-    # To add a new tool: mkdir newtool/, add files, create newtool/.links.
-    while IFS= read -r -d '' linksfile; do
-        local dir
-        dir="$(dirname "$linksfile")"
+    while IFS='=' read -r src dest; do
+        # Skip comments and empty lines
+        [[ -z "$src" || "$src" == \#* ]] && continue
 
-        while IFS='=' read -r src dest; do
-            # Skip comments and empty lines
-            [[ -z "$src" || "$src" == \#* ]] && continue
+        if [[ "$src" == "." ]]; then
+            link "$REPO_ROOT/$dir" "$HOME/$dest"
+        else
+            link "$REPO_ROOT/$dir/$src" "$HOME/$dest"
+        fi
+    done < "$linksfile"
+}
 
-            if [[ "$src" == "." ]]; then
-                link "$REPO_ROOT/$dir" "$HOME/$dest"
-            else
-                link "$REPO_ROOT/$dir/$src" "$HOME/$dest"
-            fi
-        done < "$linksfile"
-    done < <(find . -maxdepth 2 -name '.links' -not -path './.git/*' -print0)
+# Per-tool: link .links first, then run .setup (if present).
+do_tools() {
+    info "Tools"
+
+    while IFS= read -r dir; do
+        [[ -f "$dir/.links" ]] && link_from_manifest "$dir/.links"
+        if [[ -f "$dir/.setup" ]] && [ -x "$dir/.setup" ]; then
+            info "→ ${dir#./} .setup"
+            "$REPO_ROOT/$dir/.setup"
+        fi
+    done < <(discover_tools)
 }
 
 do_brew() {
@@ -72,12 +84,12 @@ do_defaults() {
 MODE="${1:-all}"
 
 case "$MODE" in
-    --link)    do_link ;;
-    --brew)    do_brew ;;
+    --tools)    do_tools ;;
+    --brew)     do_brew ;;
     --defaults) do_defaults ;;
     all)
         do_brew
-        do_link
+        do_tools
         do_defaults
         ;;
     *) fail "unknown option: $MODE." ;;

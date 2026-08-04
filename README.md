@@ -9,54 +9,72 @@ Install the prerequisites manually:
 brew install mise
 ```
 
-Apply the configuration:
+Apply all configuration:
 
 ```bash
-mise run setup
+mise run bootstrap
 ```
 
-Run one step at a time:
+You can also run each step on its own:
 
 ```bash
-mise run link       # symlinks only
-mise run brew       # packages only
-mise run defaults   # macOS defaults only
+mise run tools      # Symlink files and run per-tool setup
+mise run brew       # Install Homebrew packages
+mise run defaults   # Apply macOS defaults
 ```
 
 ## Day-to-day commands
 
 ```bash
-mise run shellcheck       # lint shell scripts
-mise run defaults:diff    # discover what defaults changed after toggling a macOS setting
-mise run brew:dump        # dump installed packages into Brewfile
+mise run shellcheck       # Lint shell scripts
+mise run defaults:diff    # Print the `defaults write` command for a settings change
+mise run brew:dump        # Write installed packages to Brewfile
 ```
 
-## Add a new config
+## Add a new tool
 
-Add a file to an existing tool dir. Then append one line to its `.links` file:
+A tool is a directory that holds the files of one program. Each tool directory can contain a `.links` manifest and an optional `.setup` script. The bootstrap step discovers tool directories by these two files.
 
-```bash
-echo 'starship.toml=.config/starship.toml' >> nvim/.links
-cp ~/.config/starship.toml nvim/starship.toml
-mise run link
-```
+### 1. Create the tool directory
 
-Add a new tool dir. Create the dir, copy the files, then write a `.links` file:
+Put the files for the program in a new directory under the repository root.
 
 ```bash
 mkdir starship/
 cp ~/.config/starship.toml starship/starship.toml
+```
+
+### 2. Declare what to symlink
+
+Create `.links` in the tool directory. Use one line per entry. Each line has the form `src=dest`. The `src` is relative to the tool directory. The `dest` is relative to `$HOME`. Use `.` as the source to symlink the whole directory.
+
+```bash
 cat > starship/.links << 'EOF'
 starship.toml=.config/starship.toml
 EOF
-mise run link
 ```
 
-Symlink a whole directory. Use `.` as the source value:
+### 3. Add a setup script (optional)
 
-```
-# mytool/.links
-.=.mytool
+Add `.setup` when the tool needs work beyond a symlink. For example, clone a plugin manager before first use. The script must be executable. It must also be safe to run more than once.
+
+```bash
+cat > tmux/.setup << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$TPM_DIR/.git" ]; then
+    git clone --depth 1 https://github.com/tmux-plugins/tpm "$TPM_DIR"
+fi
+EOF
+chmod +x tmux/.setup
 ```
 
-`.links` format: `src=dest`. `src` is relative to the tool dir. `dest` is relative to `$HOME`. The value `.` means the whole directory. 
+### 4. Apply the tool
+
+Run the tools step. It applies `.links` first, then runs `.setup`, for each tool directory.
+
+```bash
+mise run tools
+```
