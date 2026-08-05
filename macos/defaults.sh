@@ -66,13 +66,16 @@ if [ -f ~/.macos-defaults.local.sh ]; then
     . ~/.macos-defaults.local.sh
 fi
 
-echo "› Apply (some changes require a logout/restart to fully take effect)"
+gum log --level warn "Apply: some changes require a logout/restart to fully take effect"
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
-echo "› Manual setup"
-echo "  ↳ Modifier key remap (Caps Lock ⇄ Control):"
-echo "      System Settings ▸ Keyboard ▸ Keyboard Shortcuts ▸ Modifier Keys"
-echo "  ↳ Review privacy settings:"
-echo "      System Settings ▸ Privacy & Security ▸ Analytics & Improvements / Apple Advertising"
+gum style --border rounded --border-foreground 214 --padding "1 2" --foreground 255 \
+    "$(gum style --bold --foreground 214 "⚠  Manual setup required")" \
+    "" \
+    "Modifier key remap (Caps Lock ⇄ Control):" \
+    "  System Settings ▸ Keyboard ▸ Keyboard Shortcuts ▸ Modifier Keys" \
+    "Review privacy settings:" \
+    "  System Settings ▸ Privacy & Security ▸ Analytics & Improvements" \
+    "                                       ▸ Apple Advertising"
