@@ -1,8 +1,9 @@
 [tools]
 shellcheck = "latest"
+gum = "latest"
 
 [tasks.bootstrap]
-description = "Full setup: brew bundle + tools + macOS defaults."
+description = "Interactive menu to setup."
 run = "./bootstrap.sh"
 
 [tasks.tools]

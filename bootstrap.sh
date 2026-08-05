@@ -4,18 +4,25 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$REPO_ROOT"
 
-info()    { printf '  \033[1;36m%s\033[0m\n' "$*"; }
-success() { printf '  \033[32m%s\033[0m\n' "$*"; }
-warn()    { printf '  \033[33m%s\033[0m\n' "$*"; }
-fail()    { printf '  \033[31m%s\033[0m\n' "$*" >&2; exit 1; }
+info()    { gum log --level info "$*"; }
+success() { gum log --level info "✓ $*"; }
+warn()    { gum log --level warn "$*"; }
+fail()    { gum log --level fatal "$*"; exit 1; }
 
 link() {
     local src="$1" dest="$2"
     mkdir -p "$(dirname "$dest")"
     if [ -L "$dest" ]; then
         ln -sfn "$src" "$dest"
+        success "linked ~/${dest#"$HOME"/} (refreshed)"
     elif [ -e "$dest" ]; then
-        warn "skip $dest (real file exists)"
+        if gum confirm "Overwrite ~/${dest#"$HOME"/}? (dest file exists)" </dev/null; then
+            rm -f "$dest"
+            ln -sfn "$src" "$dest"
+            success "linked ~/${dest#"$HOME"/}"
+        else
+            warn "skip $dest (real file exists)"
+        fi
         return
     else
         ln -s "$src" "$dest"
@@ -39,7 +46,7 @@ link_from_manifest() {
     local linksfile="$1" dir
     dir="$(dirname "$linksfile")"
 
-    while IFS='=' read -r src dest; do
+    while IFS='=' read -r src dest || [[ -n "$src" ]]; do
         # Skip comments and empty lines
         [[ -z "$src" || "$src" == \#* ]] && continue
 
@@ -52,16 +59,24 @@ link_from_manifest() {
 }
 
 # Per-tool: link .links first, then run .setup (if present).
+# Read tool dirs into an array first, then iterate. Feeding the loop through
+# stdin would let gum confirm drain that stream and make later tool dirs
+# silently drop.
 do_tools() {
     info "Tools"
 
+    local dirs=() dir
     while IFS= read -r dir; do
+        dirs+=("$dir")
+    done < <(discover_tools)
+
+    for dir in "${dirs[@]}"; do
         [[ -f "$dir/.links" ]] && link_from_manifest "$dir/.links"
         if [[ -f "$dir/.setup" ]] && [ -x "$dir/.setup" ]; then
             info "→ ${dir#./} .setup"
-            "$REPO_ROOT/$dir/.setup"
+            gum spin --spinner dot --show-output --title "Running ${dir#./} .setup..." -- "$REPO_ROOT/$dir/.setup"
         fi
-    done < <(discover_tools)
+    done
 }
 
 do_brew() {
@@ -72,8 +87,10 @@ do_brew() {
     brew_bundle() {
         local file="$1"
         [ -f "$file" ] || return 0
-        brew bundle check --no-upgrade --file "$file" >/dev/null 2>&1 && return 0
-        brew bundle install --no-upgrade --file "$file"
+        if gum spin --spinner dot --title "Checking $(basename "$file")..." -- brew bundle check --no-upgrade --file "$file"; then
+            return 0
+        fi
+        gum spin --spinner dot --show-output --title "Installing $(basename "$file")..." -- brew bundle install --no-upgrade --file "$file"
     }
 
     brew_bundle "$REPO_ROOT/Brewfile"
@@ -88,13 +105,21 @@ do_defaults() {
     success "macOS defaults set"
 }
 
-MODE="${1:-all}"
+# With no argument, open an interactive menu to pick a step.
+# With an argument, run that step directly.
+if [[ $# -eq 0 ]]; then
+    MODE=$(gum choose --header "What do you want to do?" brew tools defaults all exit) || exit 0
+    [[ "$MODE" == "exit" ]] && exit 0
+else
+    MODE="$1"
+fi
 
 case "$MODE" in
-    --tools)    do_tools ;;
-    --brew)     do_brew ;;
-    --defaults) do_defaults ;;
+    tools|--tools)        do_tools ;;
+    brew|--brew)          do_brew ;;
+    defaults|--defaults)  do_defaults ;;
     all)
+        gum confirm "Run full bootstrap?" || exit 0
         do_brew
         do_tools
         do_defaults

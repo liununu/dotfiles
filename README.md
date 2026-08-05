@@ -9,10 +9,11 @@ Install the prerequisites manually:
 brew install mise
 ```
 
-Apply all configuration:
+Apply configuration:
 
 ```bash
-mise run bootstrap
+mise run bootstrap          # Open an interactive menu to pick step
+mise run bootstrap --all    # Run every step without the menu
 ```
 
 You can also run each step on its own:
