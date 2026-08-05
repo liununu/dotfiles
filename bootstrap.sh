@@ -105,27 +105,50 @@ do_defaults() {
     success "macOS defaults set"
 }
 
-# With no argument, open an interactive menu to pick a step.
-# With an argument, run that step directly.
+# Steps in canonical order. Each entry is "description:key".
+# gum shows the description and returns the key (see --label-delimiter).
+STEPS=(
+    "Install Homebrew packages:brew"
+    "Symlink files and run per-tool setup:tools"
+    "Apply macOS defaults:defaults"
+)
+
+# Run the do_<key> function for the given key.
+# Add a new step with one STEPS entry and one do_<key> function.
+run_step() {
+    local fn="do_$1"
+    if declare -f "$fn" >/dev/null 2>&1; then
+        "$fn"
+    else
+        fail "unknown step: $1"
+    fi
+}
+
+# With no argument, open a multi-select menu to pick steps.
+# With "all", run every step in STEPS order.
+# With step names, run those steps in the given order.
+SELECTED=()
 if [[ $# -eq 0 ]]; then
-    MODE=$(gum choose --header "What do you want to do?" brew tools defaults all exit) || exit 0
-    [[ "$MODE" == "exit" ]] && exit 0
+    PICKS=$(gum choose --no-limit --ordered \
+        --label-delimiter=":" \
+        --header "Pick steps to run:" \
+        "${STEPS[@]}") || exit 0
+    if [[ -n "$PICKS" ]]; then
+        while IFS= read -r line; do
+            SELECTED+=("$line")
+        done <<< "$PICKS"
+    fi
+elif [[ "$1" == "all" ]]; then
+    for s in "${STEPS[@]}"; do SELECTED+=("${s##*:}"); done
 else
-    MODE="$1"
+    SELECTED=("$@")
 fi
 
-case "$MODE" in
-    tools|--tools)        do_tools ;;
-    brew|--brew)          do_brew ;;
-    defaults|--defaults)  do_defaults ;;
-    all)
-        gum confirm "Run full bootstrap?" || exit 0
-        do_brew
-        do_tools
-        do_defaults
-        ;;
-    *) fail "unknown option: $MODE." ;;
-esac
+[[ ${#SELECTED[@]} -eq 0 ]] && exit 0
+
+for step in "${SELECTED[@]}"; do
+    run_step "$step"
+done
 
 echo ""
 success "Done."

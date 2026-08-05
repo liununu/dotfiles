@@ -6,18 +6,6 @@ gum = "latest"
 description = "Interactive menu to setup."
 run = "./bootstrap.sh"
 
-[tasks.tools]
-description = "Per-tool link (.links) + setup (.setup) in one pass."
-run = "./bootstrap.sh --tools"
-
-[tasks.brew]
-description = "Install packages from Brewfile."
-run = "./bootstrap.sh --brew"
-
-[tasks.defaults]
-description = "Set macOS defaults."
-run = "./bootstrap.sh --defaults"
-
 [tasks."defaults:diff"]
 description = "Discover what `defaults write` commands correspond to a macOS settings change."
 run = "macos/defaults-diff.sh"

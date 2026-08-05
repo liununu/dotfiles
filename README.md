@@ -12,16 +12,9 @@ brew install mise
 Apply configuration:
 
 ```bash
-mise run bootstrap          # Open an interactive menu to pick step
-mise run bootstrap --all    # Run every step without the menu
-```
-
-You can also run each step on its own:
-
-```bash
-mise run tools      # Symlink files and run per-tool setup
-mise run brew       # Install Homebrew packages
-mise run defaults   # Apply macOS defaults
+mise run bootstrap                  # Interactive multi-select menu
+mise run bootstrap -- all           # Run every step in order
+mise run bootstrap -- tools brew    # Run specific steps
 ```
 
 ## Day-to-day commands
@@ -77,7 +70,7 @@ chmod +x tmux/.setup
 Run the tools step. It applies `.links` first, then runs `.setup`, for each tool directory.
 
 ```bash
-mise run tools
+mise run bootstrap -- tools
 ```
 
 ## Local overrides
