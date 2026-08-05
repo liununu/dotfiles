@@ -78,3 +78,9 @@ Run the tools step. It applies `.links` first, then runs `.setup`, for each tool
 ```bash
 mise run tools
 ```
+
+## Local overrides
+
+Local overrides use the `.local` name, like `.env.local`. Each committed config loads a `.local` file when it exists. These files live in `local/` at the repo root. See [`local/README.md`](local/README.md).
+
+Git ignores `local/` except `local/README.md`. Never `git add -f` anything in it.

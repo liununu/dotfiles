@@ -59,6 +59,13 @@ defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -bool tru
 # Enable the App Exposé gesture
 defaults write com.apple.dock showAppExposeGestureEnabled -bool true
 
+# Local overrides
+if [ -f ~/.macos-defaults.local.sh ]; then
+    echo "› Local overrides"
+    # shellcheck source=/dev/null
+    . ~/.macos-defaults.local.sh
+fi
+
 echo "› Apply (some changes require a logout/restart to fully take effect)"
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true

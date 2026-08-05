@@ -68,9 +68,16 @@ do_brew() {
     info "Homebrew"
     command -v brew >/dev/null 2>&1 || fail "Homebrew not found. Install: https://brew.sh"
     brew analytics off
-    brew bundle check --no-upgrade --file "$REPO_ROOT/Brewfile" >/dev/null 2>&1 \
-        && { success "all packages installed"; return; }
-    brew bundle install --no-upgrade --file "$REPO_ROOT/Brewfile"
+
+    brew_bundle() {
+        local file="$1"
+        [ -f "$file" ] || return 0
+        brew bundle check --no-upgrade --file "$file" >/dev/null 2>&1 && return 0
+        brew bundle install --no-upgrade --file "$file"
+    }
+
+    brew_bundle "$REPO_ROOT/Brewfile"
+    brew_bundle "$HOME/.Brewfile.local"
     success "packages installed"
 }
 
