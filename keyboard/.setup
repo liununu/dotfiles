@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$(uname -s)" != "Darwin" ]; then
+    gum log --level warn "not Darwin, skipping keyboard layout"
+    exit 0
+fi
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$REPO_ROOT/keyboard/Coding.bundle"
+DEST="$HOME/Library/Keyboard Layouts/Coding.bundle"
+
+mkdir -p "$(dirname "$DEST")"
+
+# macOS does not index keyboard layouts behind a symlink, so install a real copy.
+# Re-copy only when the dest is missing or out of date.
+if [ ! -d "$DEST" ] || ! diff -rq "$SRC" "$DEST" >/dev/null 2>&1; then
+    rm -rf "$DEST"
+    cp -R "$SRC" "$DEST"
+    gum log --level info "✓ installed Coding.bundle to ~/Library/Keyboard Layouts"
+else
+    gum log --level info "Coding.bundle already up to date"
+fi
+
+gum style --border rounded --border-foreground 214 --padding "1 2" --foreground 255 \
+    "$(gum style --bold --foreground 214 "⚠  Manual setup required")" \
+    "" \
+    "macOS only loads new keyboard layouts at login." \
+    "Log out and back in (or restart) before the layout below appears." \
+    "" \
+    "Add the Coding input source:" \
+    "  System Settings ▸ Keyboard ▸ Input Sources ▸ Edit… ▸ + ▸ Others ▸ Coding" \
