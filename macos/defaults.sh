@@ -74,6 +74,8 @@ killall SystemUIServer 2>/dev/null || true
 gum style --border rounded --border-foreground 214 --padding "1 2" --foreground 255 \
     "$(gum style --bold --foreground 214 "⚠  Manual setup required")" \
     "" \
+    "Disable password autofill:" \
+    "  System Settings ▸ General ▸ AutoFill & Passwords" \
     "Modifier key remap (Caps Lock ⇄ Control):" \
     "  System Settings ▸ Keyboard ▸ Keyboard Shortcuts ▸ Modifier Keys" \
     "Review privacy settings:" \
