@@ -77,6 +77,11 @@ do_tools() {
             gum spin --spinner dot --show-output --title "Running ${dir#./} .setup..." -- "$REPO_ROOT/$dir/.setup"
         fi
     done
+
+    # local/.links is gitignored, so it may not exist until a .setup script
+    # creates it. Apply it now so the link takes effect without a second
+    # run. Safe to reapply if already linked.
+    [[ -f "local/.links" ]] && link_from_manifest "local/.links"
 }
 
 do_brew() {

@@ -4,7 +4,6 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_CONFIG="$REPO_ROOT/local/gitconfig"
 LINKS_FILE="$REPO_ROOT/local/.links"
-TARGET="$HOME/.gitconfig.local"
 
 existing_name="$(git config -f "$LOCAL_CONFIG" user.name 2>/dev/null || true)"
 existing_email="$(git config -f "$LOCAL_CONFIG" user.email 2>/dev/null || true)"
@@ -28,7 +27,4 @@ touch "$LINKS_FILE"
 grep -qxF 'gitconfig=.gitconfig.local' "$LINKS_FILE" || \
     echo 'gitconfig=.gitconfig.local' >> "$LINKS_FILE"
 
-# Symlink directly here to apply the change immediately.
-ln -sfn "$LOCAL_CONFIG" "$TARGET"
-
-gum log --level info "✓ ~/.gitconfig.local linked"
+gum log --level info "✓ local/.links updated"
