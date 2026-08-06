@@ -5,9 +5,11 @@ Put local override files here. Git ignores the whole directory except this file 
 ## How it works
 
 1. Add a file to this directory.
-2. Add a line to `local/.links`. Use `src=dest`, where `dest` is a `~/.<name>.local` path.
+2. Add a line to `local/.links`. Use `src=dest`. Name `dest` with one of these two forms:
+   - `.<name>.local`, for a file with no extension (example: `.gitconfig.local`).
+   - `.<name>.local.<ext>`, for a file with an extension (example: `.tmux.local.conf`).
 3. Run `mise run tools` to symlink it.
-4. The committed config loads the `.<name>.local` file when it exists.
+4. The committed config loads the local file when it exists.
 
 If a file is absent, nothing changes.
 
