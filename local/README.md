@@ -14,8 +14,8 @@ If a file is absent, nothing changes.
 ## Example
 
 ```bash
-# git identity
-cat > local/git-identity << 'EOF'
+# local gitconfig overrides
+cat > local/gitconfig << 'EOF'
 [user]
     name = Your Name
     email = you@example.com
@@ -29,7 +29,7 @@ EOF
 
 # symlink the files
 cat > local/.links << 'EOF'
-git-identity=.gitconfig.local
+gitconfig=.gitconfig.local
 Brewfile=.Brewfile.local
 EOF
 
