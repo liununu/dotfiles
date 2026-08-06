@@ -74,7 +74,7 @@ do_tools() {
         [[ -f "$dir/.links" ]] && link_from_manifest "$dir/.links"
         if [[ -f "$dir/.setup" ]] && [ -x "$dir/.setup" ]; then
             info "→ ${dir#./} .setup"
-            gum spin --spinner dot --show-output --title "Running ${dir#./} .setup..." -- "$REPO_ROOT/$dir/.setup"
+            "$REPO_ROOT/$dir/.setup"
         fi
     done
 
