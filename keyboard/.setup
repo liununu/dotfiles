@@ -29,4 +29,4 @@ gum style --border rounded --border-foreground 214 --padding "1 2" --foreground 
     "Log out and back in (or restart) before the layout below appears." \
     "" \
     "Add the Coding input source:" \
-    "  System Settings ▸ Keyboard ▸ Input Sources ▸ Edit… ▸ + ▸ Others ▸ Coding" \
+    "  System Settings ▸ Keyboard ▸ Input Sources ▸ Edit… ▸ + ▸ English ▸ Coding" \
