@@ -1,6 +1,7 @@
 theme = Material Darker
 window-padding-x = 8
-window-padding-y = 8
+window-padding-y = 4
+window-padding-balance = true
 cursor-style = block
 macos-titlebar-style = hidden
 config-file = ?config.local.ghostty
