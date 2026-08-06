@@ -10,12 +10,12 @@ existing_email="$(git config -f "$LOCAL_CONFIG" user.email 2>/dev/null || true)"
 
 name=""
 while [[ -z "$name" ]]; do
-    name=$(gum input --placeholder "Full name" --value "$existing_name")
+    name=$(gum input --header "Full name" --value "$existing_name")
 done
 
 email=""
 while [[ -z "$email" ]]; do
-    email=$(gum input --placeholder "Email address" --value "$existing_email")
+    email=$(gum input --header "Email address" --value "$existing_email")
 done
 
 git config -f "$LOCAL_CONFIG" user.name "$name"
