@@ -34,6 +34,12 @@ sysadminctl -screenLock immediate -password -
 echo "› Siri & Spotlight"
 # Don't share Spotlight search queries with Apple
 defaults write com.apple.assistant.support "Search Queries Data Sharing Status" -int 2
+# Disable the Spotlight search keyboard shortcut (⌘ Space)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
+    '<dict><key>enabled</key><false/></dict>'
+# Disable the Spotlight Finder search keyboard shortcut (⌥ ⌘ Space)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 \
+    '<dict><key>enabled</key><false/></dict>'
 
 echo "› Finder"
 # Show all filename extensions
