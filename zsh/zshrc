@@ -1,0 +1,37 @@
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+# Share history between all sessions.
+setopt SHARE_HISTORY
+# Delete an old command if a new command is a duplicate.
+setopt HIST_IGNORE_ALL_DUPS
+# Remove superfluous blanks from commands before saving.
+setopt HIST_REDUCE_BLANKS
+# Do not record commands that start with a space.
+setopt HIST_IGNORE_SPACE
+
+autoload -Uz up-line-or-beginning-search
+autoload -Uz down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+
+alias ls='ls -G'
+alias l='ls'
+alias ll='ls -lh'
+alias la='ls -lhA'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias grep='grep --color=auto'
+alias gst='git status'
+alias ga='git add'
+alias gcmsg='git commit --message'
+alias gp='git push'
+alias gl='git log'
+alias qrcode = "pbpaste | qrencode -t ANSI"
+
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
