@@ -32,6 +32,6 @@ alias ga='git add'
 alias gcmsg='git commit --message'
 alias gp='git push'
 alias gl='git log'
-alias qrcode = "pbpaste | qrencode -t ANSI"
+alias qrcode="pbpaste | qrencode -t ANSI"
 
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
