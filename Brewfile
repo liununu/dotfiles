@@ -1,6 +1,8 @@
+brew "fd"
 brew "git"
 brew "iperf3"
 brew "mise"
+brew "neovim"
 brew "qrencode"
 brew "tmux"
 brew "tree"

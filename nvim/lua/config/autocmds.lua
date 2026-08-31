@@ -6,3 +6,10 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+-- Send <C-l> to the shell so it can clear the screen. By default LazyVim maps it for window movement.
+vim.api.nvim_create_autocmd("TermEnter", {
+  callback = function(ev)
+    vim.keymap.set("t", "<C-l>", "<C-l>", { buffer = ev.buf, nowait = true })
+  end,
+})
