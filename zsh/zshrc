@@ -12,6 +12,10 @@ setopt HIST_REDUCE_BLANKS
 # Do not record commands that start with a space.
 setopt HIST_IGNORE_SPACE
 
+# Treat only letters and digits as word characters.
+# Then <C-w> deletes one word, not a full path.
+WORDCHARS=''
+
 autoload -Uz up-line-or-beginning-search
 autoload -Uz down-line-or-beginning-search
 zle -N up-line-or-beginning-search
@@ -30,8 +34,13 @@ alias grep='grep --color=auto'
 alias gst='git status'
 alias ga='git add'
 alias gcmsg='git commit --message'
+alias gd='git diff'
+alias gds='git diff --staged'
 alias gp='git push'
-alias gl='git log'
+alias glg='git log --stat'
+alias gpra='git pull --rebase --autostash'
+
+gcm() { git checkout "$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||')"; }
 alias qrcode="pbpaste | qrencode -t ANSI"
 
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
