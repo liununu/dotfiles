@@ -16,6 +16,12 @@ setopt HIST_IGNORE_SPACE
 # Then <C-w> deletes one word, not a full path.
 WORDCHARS=''
 
+autoload -Uz compinit
+compinit
+
+# Case-insensitive, partial-word, and substring completion.
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+
 autoload -Uz up-line-or-beginning-search
 autoload -Uz down-line-or-beginning-search
 zle -N up-line-or-beginning-search
