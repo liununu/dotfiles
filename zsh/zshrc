@@ -50,3 +50,8 @@ gcm() { git checkout "$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 
 alias qrcode="pbpaste | qrencode -t ANSI"
 
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# Load plugins.
+[[ -f "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$HOME/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+# Syntax highlighting must load last.
+[[ -f "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "$HOME/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"

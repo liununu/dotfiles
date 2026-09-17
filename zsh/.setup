@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PLUGINS_DIR="$HOME/.zsh/plugins"
+PLUGINS=(
+    "https://github.com/zsh-users/zsh-autosuggestions"
+    "https://github.com/zsh-users/zsh-syntax-highlighting"
+)
+
+mkdir -p "$PLUGINS_DIR"
+
+for url in "${PLUGINS[@]}"; do
+    name="${url##*/}"
+    if [ -d "$PLUGINS_DIR/$name/.git" ]; then
+        echo "$name already installed"
+    else
+        git clone --depth 1 "$url" "$PLUGINS_DIR/$name"
+    fi
+done
