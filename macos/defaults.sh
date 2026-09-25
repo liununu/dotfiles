@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+echo "› sudo"
+# Enable Touch ID for the sudo command (macOS 14 and later)
+PAM_TEMPLATE="/etc/pam.d/sudo_local.template"
+PAM_LOCAL="/etc/pam.d/sudo_local"
+if [ ! -f "$PAM_TEMPLATE" ]; then
+  gum log --level warn "Touch ID not enabled. $PAM_TEMPLATE does not exist."
+elif ! grep -q '^auth.*pam_tid' "$PAM_LOCAL" 2>/dev/null; then
+  # Copy the template only when no local file exists. This keeps manual changes.
+  [ -f "$PAM_LOCAL" ] || sudo cp "$PAM_TEMPLATE" "$PAM_LOCAL"
+  # Remove the comment character from the Touch ID line
+  sudo sed -i '' 's/^#auth/auth/' "$PAM_LOCAL"
+fi
+
 echo "› Desktop & Dock"
 # Automatically hide the Dock
 defaults write com.apple.dock autohide -bool true
@@ -36,10 +49,10 @@ echo "› Siri & Spotlight"
 defaults write com.apple.assistant.support "Search Queries Data Sharing Status" -int 2
 # Disable the Spotlight search keyboard shortcut (⌘ Space)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
-    '<dict><key>enabled</key><false/></dict>'
+  '<dict><key>enabled</key><false/></dict>'
 # Disable the Spotlight Finder search keyboard shortcut (⌥ ⌘ Space)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 \
-    '<dict><key>enabled</key><false/></dict>'
+  '<dict><key>enabled</key><false/></dict>'
 
 echo "› Finder"
 # Show all filename extensions
@@ -67,9 +80,9 @@ defaults write com.apple.dock showAppExposeGestureEnabled -bool true
 
 # Local overrides
 if [ -f ~/.macos-defaults.local.sh ]; then
-    echo "› Local overrides"
-    # shellcheck source=/dev/null
-    . ~/.macos-defaults.local.sh
+  echo "› Local overrides"
+  # shellcheck source=/dev/null
+  . ~/.macos-defaults.local.sh
 fi
 
 gum log --level warn "Apply: some changes require a logout/restart to fully take effect"
@@ -78,12 +91,12 @@ killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
 gum style --border rounded --border-foreground 214 --padding "1 2" --foreground 255 \
-    "$(gum style --bold --foreground 214 "⚠  Manual setup required")" \
-    "" \
-    "Disable password autofill:" \
-    "  System Settings ▸ General ▸ AutoFill & Passwords" \
-    "Modifier key remap (Caps Lock ⇄ Control):" \
-    "  System Settings ▸ Keyboard ▸ Keyboard Shortcuts ▸ Modifier Keys" \
-    "Review privacy settings:" \
-    "  System Settings ▸ Privacy & Security ▸ Analytics & Improvements" \
-    "                                       ▸ Apple Advertising"
+  "$(gum style --bold --foreground 214 "⚠  Manual setup required")" \
+  "" \
+  "Disable password autofill:" \
+  "  System Settings ▸ General ▸ AutoFill & Passwords" \
+  "Modifier key remap (Caps Lock ⇄ Control):" \
+  "  System Settings ▸ Keyboard ▸ Keyboard Shortcuts ▸ Modifier Keys" \
+  "Review privacy settings:" \
+  "  System Settings ▸ Privacy & Security ▸ Analytics & Improvements" \
+  "                                       ▸ Apple Advertising"
