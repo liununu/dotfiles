@@ -4,13 +4,24 @@ echo "› sudo"
 # Enable Touch ID for the sudo command (macOS 14 and later)
 PAM_TEMPLATE="/etc/pam.d/sudo_local.template"
 PAM_LOCAL="/etc/pam.d/sudo_local"
+PAM_REATTACH="$(brew --prefix pam-reattach 2>/dev/null || true)/lib/pam/pam_reattach.so"
 if [ ! -f "$PAM_TEMPLATE" ]; then
   gum log --level warn "Touch ID not enabled. $PAM_TEMPLATE does not exist."
-elif ! grep -q '^auth.*pam_tid' "$PAM_LOCAL" 2>/dev/null; then
-  # Copy the template only when no local file exists. This keeps manual changes.
-  [ -f "$PAM_LOCAL" ] || sudo cp "$PAM_TEMPLATE" "$PAM_LOCAL"
-  # Remove the comment character from the Touch ID line
-  sudo sed -i '' 's/^#auth/auth/' "$PAM_LOCAL"
+else
+  if ! grep -q '^auth.*pam_tid' "$PAM_LOCAL" 2>/dev/null; then
+    # Copy the template only when no local file exists. This keeps manual changes.
+    [ -f "$PAM_LOCAL" ] || sudo cp "$PAM_TEMPLATE" "$PAM_LOCAL"
+    # Remove the comment character from the Touch ID line
+    sudo sed -i '' 's/^#auth/auth/' "$PAM_LOCAL"
+  fi
+  if [ ! -f "$PAM_REATTACH" ]; then
+    gum log --level warn "pam-reattach not installed. Touch ID for sudo will not show inside tmux."
+  elif ! grep -q '^auth.*pam_reattach' "$PAM_LOCAL" 2>/dev/null; then
+    # pam_reattach must run before pam_tid
+    sudo sed -i '' "/^auth.*pam_tid/i\\
+auth       optional       $PAM_REATTACH
+" "$PAM_LOCAL"
+  fi
 fi
 
 echo "› Desktop & Dock"
