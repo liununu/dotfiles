@@ -93,8 +93,8 @@ _prompt_git_info() {
     local -a marks
     # The prompt treats "%" as an escape character. Write "%%" to show one "%".
     marks=("%F{magenta}${branch//\%/%%}")
-    # The plus-minus sign marks changes and files that git does not track.
-    (( dirty || untracked )) && marks+=('%F{yellow}±')
+    # The star marks changes and files that git does not track.
+    (( dirty || untracked )) && marks[1]+='%F{yellow}*'
     (( ahead )) && marks+=('%F{yellow}↑')
     (( behind )) && marks+=('%F{yellow}↓')
     _prompt_git=" ${marks[*]}%f"
