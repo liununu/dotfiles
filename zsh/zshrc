@@ -29,6 +29,96 @@ zle -N down-line-or-beginning-search
 bindkey '^[[A' up-line-or-beginning-search
 bindkey '^[[B' down-line-or-beginning-search
 
+setopt PROMPT_SUBST
+autoload -Uz add-zsh-hook
+
+# Shorten the working directory for the prompt.
+_prompt_shorten_dir() {
+    local dir="${PWD/#$HOME/~}"
+    local -a parts
+    parts=("${(@s:/:)dir}")
+    # Do not change a path that has two parts or less.
+    if (( ${#parts} <= 2 )); then
+        print -r -- "${dir//\%/%%}"
+        return
+    fi
+    local -a shortened
+    local part
+    for part in "${(@)parts[1,-2]}"; do
+        if [[ $part == .* ]]; then
+            shortened+=("${part:0:2}")
+        else
+            shortened+=("${part:0:1}")
+        fi
+    done
+    # The prompt treats "%" as an escape character. Write "%%" to show one "%".
+    print -r -- "${(j:/:)shortened}/${parts[-1]//\%/%%}"
+}
+
+# Get the git data for the prompt.
+_prompt_git_info() {
+    _prompt_git=''
+    local status_output
+    # GIT_OPTIONAL_LOCKS=0 stops git from taking optional locks.
+    # This prevents a conflict with the git commands of the user.
+    status_output=$(GIT_OPTIONAL_LOCKS=0 command git status --porcelain=v2 --branch 2>/dev/null) || return
+
+    local branch='' oid='' ahead=0 behind=0 dirty=0 untracked=0
+    local line
+    for line in ${(f)status_output}; do
+        case $line in
+            '# branch.oid '*)
+                oid=${line#'# branch.oid '}
+                ;;
+            '# branch.head '*)
+                branch=${line#'# branch.head '}
+                ;;
+            '# branch.ab '*)
+                # Git writes "+0" or "-0" when the branch is in sync.
+                [[ $line == *' +0 '* ]] || ahead=1
+                [[ $line == *' -0' ]] || behind=1
+                ;;
+            [12u]' '*)
+                dirty=1
+                ;;
+            '?'*)
+                untracked=1
+                ;;
+        esac
+    done
+
+    # Use the short commit hash when the HEAD is detached.
+    [[ $branch == '(detached)' ]] && branch=${oid[1,7]}
+
+    local -a marks
+    # The prompt treats "%" as an escape character. Write "%%" to show one "%".
+    marks=("%F{magenta}${branch//\%/%%}")
+    # The plus-minus sign marks changes and files that git does not track.
+    (( dirty || untracked )) && marks+=('%F{yellow}±')
+    (( ahead )) && marks+=('%F{yellow}↑')
+    (( behind )) && marks+=('%F{yellow}↓')
+    _prompt_git=" ${marks[*]}%f"
+    return 0
+}
+
+# Set the prompt data before zsh writes each prompt.
+_prompt_precmd() {
+    local -i exit_code=$?
+    _prompt_dir=$(_prompt_shorten_dir)
+    _prompt_git_info
+    if (( exit_code )); then
+        _prompt_lambda='%F{red}'
+    else
+        _prompt_lambda='%F{green}'
+    fi
+    # Give the stored exit status to the hooks that run after this hook.
+    return exit_code
+}
+add-zsh-hook precmd _prompt_precmd
+
+# The lambda is green after a command that succeeded, and red after a command that failed.
+PROMPT='${_prompt_lambda}λ%f %F{cyan}${_prompt_dir}%f${_prompt_git} '
+
 alias ls='ls -G'
 alias l='ls'
 alias ll='ls -lh'
