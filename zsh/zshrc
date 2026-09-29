@@ -22,6 +22,11 @@ compinit
 # Case-insensitive, partial-word, and substring completion.
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
 
+# Load the module that shows the completion menu.
+zmodload zsh/complist
+# Start a menu after the second Tab. Then the arrow keys move through the candidates.
+zstyle ':completion:*' menu select
+
 autoload -Uz up-line-or-beginning-search
 autoload -Uz down-line-or-beginning-search
 zle -N up-line-or-beginning-search
