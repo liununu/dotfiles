@@ -9,6 +9,22 @@ Install the prerequisites manually:
 brew install mise
 ```
 
+Clone this repository, then install the tools that the tasks need:
+
+```bash
+git clone git@github.com:liununu/dotfiles.git
+# or via HTTPS
+git clone https://github.com/liununu/dotfiles.git
+cd dotfiles
+mise install
+```
+
+This repository holds personal preferences. Review it, then make it yours:
+
+- Edit `Brewfile`. Remove the packages that you do not use.
+- Remove the tool directories or `.links` lines that you do not need.
+- Put private data in `local/`. See "Local overrides".
+
 Apply configuration:
 
 ```bash
