@@ -65,6 +65,18 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 \
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 \
   '<dict><key>enabled</key><false/></dict>'
 
+echo "› Services"
+# Disable the "Open man Page in Terminal" service.
+# This removes the default shortcut (⇧ ⌘ A).
+defaults write pbs NSServicesStatus -dict-add \
+  'com.apple.Terminal - Open man Page in Terminal - openManPage' \
+  '<dict><key>enabled_context_menu</key><false/><key>enabled_services_menu</key><false/><key>presentation_modes</key><dict><key>ContextMenu</key><false/><key>ServicesMenu</key><false/></dict></dict>'
+# Disable the "Search man Page Index in Terminal" service.
+# This removes the default shortcut (⇧ ⌘ A).
+defaults write pbs NSServicesStatus -dict-add \
+  'com.apple.Terminal - Search man Page Index in Terminal - searchManPages' \
+  '<dict><key>enabled_context_menu</key><false/><key>enabled_services_menu</key><false/><key>presentation_modes</key><dict><key>ContextMenu</key><false/><key>ServicesMenu</key><false/></dict></dict>'
+
 echo "› Finder"
 # Show all filename extensions
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
