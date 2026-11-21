@@ -1,2 +1,2 @@
 opencode.jsonc=.config/opencode/opencode.jsonc
-tui.json=.config/opencode/tui.json
+cli.json=.config/opencode/cli.json

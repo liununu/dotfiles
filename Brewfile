@@ -1,3 +1,4 @@
+tap "anomalyco/tap"
 brew "fd"
 brew "git"
 brew "iperf3"
@@ -8,6 +9,7 @@ brew "pam-reattach"
 brew "qrencode"
 brew "tmux"
 brew "tree"
+brew "anomalyco/tap/opencode-v2", trusted: true
 cask "1password"
 cask "1password-cli"
 cask "ghostty"
