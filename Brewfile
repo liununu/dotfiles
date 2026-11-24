@@ -1,5 +1,6 @@
 tap "anomalyco/tap"
 brew "fd"
+brew "gh"
 brew "git"
 brew "iperf3"
 brew "lazygit"
